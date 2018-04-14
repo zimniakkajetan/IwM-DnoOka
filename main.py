@@ -114,12 +114,13 @@ class Window(Frame):
         return pic
 
     def denoise(self,pic):
+        pic2=np.copy(pic)
         for i in range(1,pic.shape[0]-1):
             for j in range(1, pic.shape[1]-1):
                 if pic[i][j]==255:
                     if pic[i-1][j-1]==0 and pic[i-1][j]==0 and pic[i-1][j+1]==0 and pic[i][j-1]==0 and pic[i][j+1]==0 and pic[i+1][j-1]==0 and pic[i+1][j]==0 and pic[i+1][j+1]==0:
-                        pic[i][j]=0
-        return pic
+                        pic2[i][j]=0
+        return pic2
 
     def contourClose(selfs,pic):
         im2, contours, hierarchy = cv2.findContours(pic, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
