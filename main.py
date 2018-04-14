@@ -107,6 +107,8 @@ class Window(Frame):
         pic=self.denoise(pic)
         #zamkniecie naczyn
         pic=self.contourClose(pic)
+        pic=self.morphologicClose(pic,2)
+
         #alternatywne:
         #pic=self.morphologicClose(pic)
 
@@ -126,8 +128,8 @@ class Window(Frame):
         im2, contours, hierarchy = cv2.findContours(pic, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         return cv2.drawContours(pic, contours, -1, (255, 255, 255), 2)
 
-    def morphologicClose(self,pic):
-        kernel = np.ones((3, 3), np.uint8)
+    def morphologicClose(self,pic,size):
+        kernel = np.ones((size, size), np.uint8)
         return cv2.morphologyEx(pic, cv2.MORPH_CLOSE, kernel)
 
     def setFirstStepOutput(self,pic):
