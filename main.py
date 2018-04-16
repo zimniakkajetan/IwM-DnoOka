@@ -60,14 +60,31 @@ class Window(Frame):
         top_padding=20
         bottom_padding=5
 
+        Label(self,text="Parametry:").grid(row=2,column=0,pady=(top_padding,bottom_padding))
+        Label(self, text="Próg binaryzacji:").grid(row=3, column=0, sticky='w', padx=xpadding)
+        self.thresholdEntry = Entry(self, width=4, justify=RIGHT)
+        self.thresholdEntry.grid(row=3, column=0, sticky='e', padx=xpadding)
+
+        self.denoiseVar = IntVar(value=1)
+        Checkbutton(self,text="Użyj odszumiania",variable=self.denoiseVar).grid(row=4,column=0,sticky='w',padx=xpadding)
+
+        self.closingVar = IntVar(value=1)
+        Radiobutton(self,text="Nie wypełniaj naczyń",variable=self.closingVar,value=1).grid(row=5,column=0,sticky='w',padx=xpadding)
+        Radiobutton(self,text="Wypełnij metodą konturową",variable=self.closingVar,value=2).grid(row=6,column=0,sticky='w',padx=xpadding)
+        Radiobutton(self,text="Wypełnij metodą morfologiczną",variable=self.closingVar,value=3).grid(row=7,column=0,sticky='w',padx=xpadding)
+
+
         self.startButton = Button(self, text="Start", command=self.firstStep, width=8)
         self.startButton.grid(row=8, column=2, sticky='e', padx=20, pady=10)
 
         self.error = StringVar()
         Label(self, textvariable=self.error, fg="red", font=("Helvetica", 16)).grid(row=8)
 
+        self.set_default_values()
         self.master.update()
 
+    def set_default_values(self):
+        self.thresholdEntry.insert(END, 20)
 
     def upload_input_file(self):
         filename = filedialog.askopenfilename(filetypes=[('Image','jpg jpeg png gif')])
@@ -101,16 +118,16 @@ class Window(Frame):
 
         pic = np.array(pic)
 
-        th, pic = cv2.threshold(pic, 20, 255, cv2.THRESH_BINARY);
+        th, pic = cv2.threshold(pic, int(self.thresholdEntry.get()), 255, cv2.THRESH_BINARY);
 
         #filtr gaszący pixel jeżeli każdy z 8 sąsiadów jest zgaszony
-        pic=self.denoise(pic)
+        if self.denoiseVar.get()==1:
+            pic=self.denoise(pic)
         #zamkniecie naczyn
-        pic=self.contourClose(pic)
-        pic=self.morphologicClose(pic,2)
-
-        #alternatywne:
-        #pic=self.morphologicClose(pic)
+        if self.closingVar.get()==2:
+            pic=self.contourClose(pic)
+        elif self.closingVar.get()==3:
+            pic=self.morphologicClose(pic,3)
 
         self.setFirstStepOutput(Image.fromarray(pic))
         return pic
@@ -147,7 +164,7 @@ class Window(Frame):
         return sqrt(suma / (len(pic1)*len(pic1[0])))
 
 root = Tk()
-root.geometry("920x460")
+root.geometry("920x560")
 
 app=Window(root)
 
