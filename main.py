@@ -111,7 +111,7 @@ class Window(Frame):
 
     def firstStep1(self):
         pic = obraz.wejsciowy
-        print(pic)
+
         pic = pic.convert('L')
 
         pic = pic.filter(ImageFilter.FIND_EDGES)
@@ -130,6 +130,16 @@ class Window(Frame):
             pic=self.morphologicClose(pic,3)
 
         self.setFirstStepOutput(Image.fromarray(pic))
+
+        orgPic=np.array(obraz.wejsciowy)
+
+        for i in range (0,orgPic.shape[0]):
+            for j in range(0,orgPic.shape[1]):
+                if pic[i][j]==255:
+                    orgPic[i][j]=pic[i][j]
+                    
+        self.setSecondStepOutput(Image.fromarray(orgPic))
+
         return pic
 
     def denoise(self,pic):
@@ -154,6 +164,10 @@ class Window(Frame):
         self.firstCanvas.image = ImageTk.PhotoImage(pic)
         #self.firstCanvas.image = ImageTk.PhotoImage(pic)
         self.firstCanvas.create_image(0, 0, image=self.firstCanvas.image, anchor=NW)
+
+    def setSecondStepOutput(self,pic):
+        self.outputCanvas.image=ImageTk.PhotoImage(pic)
+        self.outputCanvas.create_image(0, 0, image=self.outputCanvas.image, anchor=NW)
 
     def blad(self, pic1, pic2):
         suma = 0
