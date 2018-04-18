@@ -119,7 +119,7 @@ class Window(Frame):
         pic = np.array(pic)
 
         th, pic = cv2.threshold(pic, int(self.thresholdEntry.get()), 255, cv2.THRESH_BINARY);
-
+        pic=self.delete_boundary(pic,np.array(obraz.wejsciowy.convert('L')))
         #filtr gaszący pixel jeżeli każdy z 8 sąsiadów jest zgaszony
         if self.denoiseVar.get()==1:
             pic=self.denoise(pic)
@@ -137,10 +137,21 @@ class Window(Frame):
             for j in range(0,orgPic.shape[1]):
                 if pic[i][j]==255:
                     orgPic[i][j]=pic[i][j]
-                    
+
         self.setSecondStepOutput(Image.fromarray(orgPic))
 
         return pic
+
+    def delete_boundary(self,pic,orignialPic):
+        th, mask = cv2.threshold(orignialPic, 0, 255, cv2.THRESH_BINARY);
+        kernel = np.ones((5, 5), np.uint8)
+        mask = cv2.erode(mask,kernel,iterations = 1)
+        for i in range(0,pic.shape[0]):
+            for j in range(0,pic.shape[1]):
+                if(mask[i][j]==0):
+                    pic[i][j]=0
+        return pic
+
 
     def denoise(self,pic):
         pic2=np.copy(pic)
